@@ -1,7 +1,26 @@
 import {QUANTITY} from './consts.js';
+import {disablePage} from './form.js';
 import {generateMockData} from './generate-mock-data.js';
+import {createOfferCardElement} from './create-offer-card-element.js';
 
-// eslint-disable-next-line
+const mapElement = document.querySelector('#map-canvas');
+
 const offers = new Array(QUANTITY)
   .fill(null)
   .map((element, index) => generateMockData(index));
+
+// eslint-disable-next-line
+const createOffersCardElements = (elements) => {
+  const offerCardsFragment = document.createDocumentFragment();
+
+  elements.forEach((element) => {
+    const offerCardElement = createOfferCardElement(element);
+
+    offerCardsFragment.appendChild(offerCardElement);
+  });
+
+  mapElement.appendChild(offerCardsFragment);
+};
+
+mapElement.appendChild(createOfferCardElement(offers[0]));
+disablePage(false);
