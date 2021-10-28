@@ -23,4 +23,4 @@ const createOffersCardElements = (elements) => {
 };
 
 mapElement.appendChild(createOfferCardElement(offers[0]));
-disablePage(false);
+disablePage(true);
