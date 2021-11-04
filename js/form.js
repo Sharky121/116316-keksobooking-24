@@ -70,18 +70,26 @@ const validateAdPrice = () => {
   adPriceInput.reportValidity();
 };
 
-const validateRoomToCapacity = () => {
+const isValidRoomToCapacity = () => {
   const roomValue = getOptionValue(adRoomSelect);
   const capacityValue = getOptionValue(adCapacitySelect);
   const isRoomToCapacity = roomsToCapacity[roomValue].includes(parseInt(capacityValue, 10));
 
+  let errorMessage = '';
+
   if (!isRoomToCapacity) {
-    adRoomSelect.setCustomValidity('Количество комнат не соответствуте количеству мест');
-  } else {
-    adRoomSelect.setCustomValidity('');
+    errorMessage = 'Количество комнат не соответствуте количеству мест';
   }
 
+  adRoomSelect.setCustomValidity(errorMessage);
   adRoomSelect.reportValidity();
+};
+
+const isValidTypeToPrice = () => {
+  const priceValue = typeToPrice[getOptionValue(adTypeSelect)];
+
+  adPriceInput.placeholder = priceValue;
+  adPriceInput.min = priceValue;
 };
 
 const syncTimeSelect = (firstSelect, secondSelect) => {
@@ -123,10 +131,7 @@ adPriceInput.addEventListener('input', () => {
 });
 
 adTypeSelect.addEventListener('change', () => {
-  const priceValue = typeToPrice[getOptionValue(adTypeSelect)];
-
-  adPriceInput.placeholder = priceValue;
-  adPriceInput.min = priceValue;
+  isValidTypeToPrice();
 });
 
 adTimeInSelect.addEventListener('change', () => {
@@ -138,7 +143,8 @@ adTimeOutSelect.addEventListener('change', () => {
 });
 
 adSubmitButton.addEventListener('click', () => {
-  validateRoomToCapacity();
+  isValidTypeToPrice();
+  isValidRoomToCapacity();
 });
 
 disablePage(false);
