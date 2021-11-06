@@ -1,5 +1,5 @@
+import './form.js';
 import {QUANTITY} from './consts.js';
-import {disablePage} from './form.js';
 import {generateMockData} from './generate-mock-data.js';
 import {createOfferCardElement} from './create-offer-card-element.js';
 
@@ -23,4 +23,4 @@ const createOffersCardElements = (elements) => {
 };
 
 mapElement.appendChild(createOfferCardElement(offers[0]));
-disablePage(true);
+
