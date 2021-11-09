@@ -52,7 +52,7 @@ const createFeatures = (features, featuresListElement) => {
   });
 };
 
-export const createOfferCardElement = (offer) => {
+export const createCustomPopup = (offer) => {
   const {
     author: {avatar},
     offer: {

@@ -1,6 +1,7 @@
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
 const MAX_PRICE = 1000000;
+const RADIX = 10;
 
 const roomsToCapacity = {
   1: [1],
@@ -16,24 +17,23 @@ const typeToPrice = {
   'hotel': 3000,
 };
 
-const Forms = {
-  ad: document.querySelector('.ad-form'),
-  filter: document.querySelector('.map__filters'),
-};
+const adForm = document.querySelector('.ad-form');
+const filterForm = document.querySelector('.map__filters');
+
 const FiltersFormElements = {
-  select: Forms.filter.querySelectorAll('.map__filter'),
-  checkbox: Forms.filter.querySelectorAll('.map__checkbox'),
+  select: filterForm.querySelectorAll('.map__filter'),
+  checkbox: filterForm.querySelectorAll('.map__checkbox'),
 };
 
-const adFormFieldsetElements = Forms.ad.querySelectorAll('.ad-form__element');
-const adTitleInput = Forms.ad.querySelector('#title');
-const adPriceInput = Forms.ad.querySelector('#price');
-const adTypeSelect = Forms.ad.querySelector('#type');
-const adRoomSelect = Forms.ad.querySelector('#room_number');
-const adCapacitySelect = Forms.ad.querySelector('#capacity');
-const adTimeInSelect = Forms.ad.querySelector('#timein');
-const adTimeOutSelect = Forms.ad.querySelector('#timeout');
-const adSubmitButton = Forms.ad.querySelector('.ad-form__submit');
+const adFormFieldsetElements = adForm.querySelectorAll('.ad-form__element');
+const adTitleInput = adForm.querySelector('#title');
+const adPriceInput = adForm.querySelector('#price');
+const adTypeSelect = adForm.querySelector('#type');
+const adRoomSelect = adForm.querySelector('#room_number');
+const adCapacitySelect = adForm.querySelector('#capacity');
+const adTimeInSelect = adForm.querySelector('#timein');
+const adTimeOutSelect = adForm.querySelector('#timeout');
+const adSubmitButton = adForm.querySelector('.ad-form__submit');
 
 const getOptionValue = (select) => {
   const selectedOptionIndex = select.options.selectedIndex;
@@ -55,9 +55,9 @@ const validateAdTitle = () => {
   adTitleInput.reportValidity();
 };
 
-const validateAdPrice = () => {
-  const value = adPriceInput.value;
-  const minValue = adPriceInput.min ;
+const validateAdPrice = (priceInput) => {
+  const value = parseInt(priceInput.value, RADIX);
+  const minValue = parseInt(adPriceInput.min, RADIX);
 
   if (value > MAX_PRICE) {
     adPriceInput.setCustomValidity(`Цена не должна превышать ${MAX_PRICE}`);
@@ -73,7 +73,7 @@ const validateAdPrice = () => {
 const isValidRoomToCapacity = () => {
   const roomValue = getOptionValue(adRoomSelect);
   const capacityValue = getOptionValue(adCapacitySelect);
-  const isRoomToCapacity = roomsToCapacity[roomValue].includes(parseInt(capacityValue, 10));
+  const isRoomToCapacity = roomsToCapacity[roomValue].includes(parseInt(capacityValue, RADIX));
 
   let errorMessage = '';
 
@@ -108,43 +108,36 @@ const toggleElementsActivity = (elements, status) => {
   });
 };
 
-const disablePage = (status) => {
+export const isActiveForm = (status) => {
   if (status) {
-    Forms.ad.classList.add('ad-form--disabled');
-    Forms.filter.classList.add('map__filters--disabled');
+    adForm.classList.remove('ad-form--disabled');
+    filterForm.classList.remove('map__filters--disabled');
+
+    adTitleInput.addEventListener('input', () => {
+      validateAdTitle();
+    });
+    adPriceInput.addEventListener('input', (evt) => {
+      validateAdPrice(evt.target);
+    });
+    adTypeSelect.addEventListener('change', () => {
+      isValidTypeToPrice();
+    });
+    adTimeInSelect.addEventListener('change', () => {
+      syncTimeSelect(adTimeInSelect, adTimeOutSelect);
+    });
+    adTimeOutSelect.addEventListener('change', () => {
+      syncTimeSelect(adTimeOutSelect, adTimeInSelect);
+    });
+    adSubmitButton.addEventListener('click', () => {
+      isValidTypeToPrice();
+      isValidRoomToCapacity();
+    });
   } else {
-    Forms.ad.classList.remove('ad-form--disabled');
-    Forms.filter.classList.remove('map__filters--disabled');
+    adForm.classList.add('ad-form--disabled');
+    filterForm.classList.add('map__filters--disabled');
+
+    toggleElementsActivity(FiltersFormElements.select, status);
+    toggleElementsActivity(FiltersFormElements.checkbox, status);
+    toggleElementsActivity(adFormFieldsetElements, status);
   }
-
-  toggleElementsActivity(FiltersFormElements.select, status);
-  toggleElementsActivity(FiltersFormElements.checkbox, status);
-  toggleElementsActivity(adFormFieldsetElements, status);
 };
-
-adTitleInput.addEventListener('input', () => {
-  validateAdTitle();
-});
-
-adPriceInput.addEventListener('input', () => {
-  validateAdPrice();
-});
-
-adTypeSelect.addEventListener('change', () => {
-  isValidTypeToPrice();
-});
-
-adTimeInSelect.addEventListener('change', () => {
-  syncTimeSelect(adTimeInSelect, adTimeOutSelect);
-});
-
-adTimeOutSelect.addEventListener('change', () => {
-  syncTimeSelect(adTimeOutSelect, adTimeInSelect);
-});
-
-adSubmitButton.addEventListener('click', () => {
-  isValidTypeToPrice();
-  isValidRoomToCapacity();
-});
-
-disablePage(false);
