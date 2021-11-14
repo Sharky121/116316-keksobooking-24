@@ -1,3 +1,6 @@
+import {sendData} from './fetch-api.js';
+import {createResponseMessage} from './create-response-message.js';
+
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
 const MAX_PRICE = 1000000;
@@ -17,6 +20,11 @@ const typeToPrice = {
   'hotel': 3000,
 };
 
+const ResponseMessage = {
+  SUCCESS: 'success',
+  ERROR: 'error',
+};
+
 const adForm = document.querySelector('.ad-form');
 const filterForm = document.querySelector('.map__filters');
 
@@ -33,7 +41,6 @@ const adRoomSelect = adForm.querySelector('#room_number');
 const adCapacitySelect = adForm.querySelector('#capacity');
 const adTimeInSelect = adForm.querySelector('#timein');
 const adTimeOutSelect = adForm.querySelector('#timeout');
-const adSubmitButton = adForm.querySelector('.ad-form__submit');
 
 const getOptionValue = (select) => {
   const selectedOptionIndex = select.options.selectedIndex;
@@ -108,6 +115,38 @@ const toggleElementsActivity = (elements, status) => {
   });
 };
 
+const resetPage = (resetMap) => {
+  adForm.reset();
+  filterForm.reset();
+  setTimeout(resetMap, 1);
+};
+
+export const setSubmitForm = (resetMap) => {
+  adForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    isValidTypeToPrice();
+    isValidRoomToCapacity();
+
+    sendData(
+      () => {
+        createResponseMessage(ResponseMessage.SUCCESS);
+        resetPage(resetMap);
+      },
+      () => {
+        createResponseMessage(ResponseMessage.ERROR);
+      },
+      new FormData(adForm),
+    );
+  });
+};
+
+export const setResetForm = (resetMap) => {
+  adForm.addEventListener('reset', () => {
+    resetPage(resetMap);
+  });
+};
+
 export const isActiveForm = (status) => {
   if (status) {
     adForm.classList.remove('ad-form--disabled');
@@ -127,10 +166,6 @@ export const isActiveForm = (status) => {
     });
     adTimeOutSelect.addEventListener('change', () => {
       syncTimeSelect(adTimeOutSelect, adTimeInSelect);
-    });
-    adSubmitButton.addEventListener('click', () => {
-      isValidTypeToPrice();
-      isValidRoomToCapacity();
     });
   } else {
     adForm.classList.add('ad-form--disabled');

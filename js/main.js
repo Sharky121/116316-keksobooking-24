@@ -1,11 +1,18 @@
 import {QUANTITY} from './consts.js';
-import {generateMockData} from './generate-mock-data.js';
-import {renderMap} from './map.js';
-import {isActiveForm} from './form.js';
-
-const offers = new Array(QUANTITY)
-  .fill(null)
-  .map((element, index) => generateMockData(index));
+import {renderMap, renderMarkers, resetMap} from './map.js';
+import {isActiveForm, setSubmitForm, setResetForm} from './form.js';
+import {getData} from './fetch-api.js';
+import {showAlert} from './utils.js';
 
 isActiveForm(false);
-renderMap(offers);
+renderMap();
+
+getData(
+  (offers) => {
+    renderMarkers(offers.slice(0, QUANTITY));
+  },
+  (error) => showAlert(error),
+);
+
+setSubmitForm(resetMap);
+setResetForm(resetMap);

@@ -2,7 +2,7 @@ import {createCustomPopup} from './create-offer-card-element.js';
 import {isActiveForm} from './form.js';
 
 const MapDefaults = {
-  ID: 'map-canvas',
+  CONTAINER: 'map-canvas',
   URL_TEMPLATE: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   TILE_ATTRIBUTION: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   ZOOM: 12,
@@ -13,6 +13,8 @@ const MapDefaults = {
   },
   coordsInput: document.querySelector('#address'),
 };
+
+const map = L.map(MapDefaults.CONTAINER);
 
 const Pins = {
   Main: {
@@ -63,14 +65,30 @@ const createMarkers = (points) => points.map((point) => {
     {
       icon: pinIcon,
     },
-  )
-    .bindPopup(createCustomPopup(point));
+  ).bindPopup(createCustomPopup(point));
 });
 
-export const renderMap = (points) => {
-  const markersGroup = L.layerGroup(createMarkers(points));
+export const resetMap = () => {
+  map.setView(
+    {
+      lat: MapDefaults.CenterCoords.LAT,
+      lng: MapDefaults.CenterCoords.LNG,
+    },
+    MapDefaults.ZOOM).closePopup();
 
-  const map = L.map(MapDefaults.ID)
+  mainMarker.setLatLng(L.latLng(MapDefaults.CenterCoords.LAT, MapDefaults.CenterCoords.LNG));
+
+  setCoordsToInput(MapDefaults.CenterCoords.LAT, MapDefaults.CenterCoords.LNG);
+};
+
+export const renderMarkers = (offers) => {
+  const markersGroup = L.layerGroup(createMarkers(offers));
+
+  markersGroup.addTo(map);
+};
+
+export const renderMap = () => {
+  map
     .on('load', () => {
       isActiveForm(true);
       setCoordsToInput(MapDefaults.CenterCoords.LAT, MapDefaults.CenterCoords.LNG);
@@ -89,8 +107,4 @@ export const renderMap = (points) => {
       setCoordsToInput(lat, lng);
     })
     .addTo(map);
-
-  markersGroup.addTo(map);
-
-  return map;
 };
