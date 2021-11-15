@@ -127,7 +127,7 @@ export const setSubmitForm = (resetMap) => {
 
     isValidRoomToCapacity();
 
-    if (evt.target.reportValidity()) {
+    if (evt.target.checkValidity()) {
       sendData(
         () => {
           createResponseMessage(ResponseMessage.SUCCESS);
