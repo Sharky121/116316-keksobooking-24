@@ -62,7 +62,7 @@ const validateAdTitle = () => {
   adTitleInput.reportValidity();
 };
 
-const validateAdPrice = (priceInput) => {
+const isValidTypeToPrice = (priceInput) => {
   const value = parseInt(priceInput.value, RADIX);
   const minValue = parseInt(adPriceInput.min, RADIX);
 
@@ -85,14 +85,14 @@ const isValidRoomToCapacity = () => {
   let errorMessage = '';
 
   if (!isRoomToCapacity) {
-    errorMessage = 'Количество комнат не соответствуте количеству мест';
+    errorMessage ='Количество комнат не соответствуте количеству мест';
   }
 
   adRoomSelect.setCustomValidity(errorMessage);
   adRoomSelect.reportValidity();
 };
 
-const isValidTypeToPrice = () => {
+const setTypeToPrice = () => {
   const priceValue = typeToPrice[getOptionValue(adTypeSelect)];
 
   adPriceInput.placeholder = priceValue;
@@ -118,26 +118,27 @@ const toggleElementsActivity = (elements, status) => {
 const resetPage = (resetMap) => {
   adForm.reset();
   filterForm.reset();
-  setTimeout(resetMap, 1);
+  resetMap();
 };
 
 export const setSubmitForm = (resetMap) => {
   adForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
 
-    isValidTypeToPrice();
     isValidRoomToCapacity();
 
-    sendData(
-      () => {
-        createResponseMessage(ResponseMessage.SUCCESS);
-        resetPage(resetMap);
-      },
-      () => {
-        createResponseMessage(ResponseMessage.ERROR);
-      },
-      new FormData(adForm),
-    );
+    if (evt.target.reportValidity()) {
+      sendData(
+        () => {
+          createResponseMessage(ResponseMessage.SUCCESS);
+          resetPage(resetMap);
+        },
+        () => {
+          createResponseMessage(ResponseMessage.ERROR);
+        },
+        new FormData(adForm),
+      );
+    }
   });
 };
 
@@ -149,6 +150,8 @@ export const setResetForm = (resetMap) => {
 
 export const isActiveForm = (status) => {
   if (status) {
+    setTypeToPrice();
+
     adForm.classList.remove('ad-form--disabled');
     filterForm.classList.remove('map__filters--disabled');
 
@@ -156,16 +159,22 @@ export const isActiveForm = (status) => {
       validateAdTitle();
     });
     adPriceInput.addEventListener('input', (evt) => {
-      validateAdPrice(evt.target);
+      isValidTypeToPrice(evt.target);
     });
     adTypeSelect.addEventListener('change', () => {
-      isValidTypeToPrice();
+      setTypeToPrice();
     });
     adTimeInSelect.addEventListener('change', () => {
       syncTimeSelect(adTimeInSelect, adTimeOutSelect);
     });
     adTimeOutSelect.addEventListener('change', () => {
       syncTimeSelect(adTimeOutSelect, adTimeInSelect);
+    });
+    adRoomSelect.addEventListener('change', () => {
+      isValidRoomToCapacity();
+    });
+    adCapacitySelect.addEventListener('change', () => {
+      isValidRoomToCapacity();
     });
   } else {
     adForm.classList.add('ad-form--disabled');

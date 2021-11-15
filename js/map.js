@@ -100,6 +100,8 @@ export const renderMap = () => {
 
   L.tileLayer(MapDefaults.URL_TEMPLATE,{attribution: MapDefaults.TILE_ATTRIBUTION}).addTo(map);
 
+  MapDefaults.coordsInput.setAttribute('value', `${MapDefaults.CenterCoords.LAT}, ${MapDefaults.CenterCoords.LNG}`);
+
   mainMarker
     .on('move', (evt) => {
       const {lat, lng} = evt.target.getLatLng();
