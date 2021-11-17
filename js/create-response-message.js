@@ -1,0 +1,37 @@
+import {isEscapeKey} from './utils.js';
+
+const removeResponseMessage = (modalElement) => {
+  const onPopupEscKeydown = (evt) => {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+
+      modalElement.remove();
+      document.removeEventListener('keydown', onPopupEscKeydown);
+    }
+  };
+
+  const onDocumentClick = () => {
+    modalElement.remove();
+    document.removeEventListener('keydown', onDocumentClick);
+  };
+
+  document.addEventListener('keydown', onPopupEscKeydown);
+  document.addEventListener('click', onDocumentClick);
+};
+
+export const createResponseMessage = (type) => {
+  const responseMessageTemplate = document.querySelector(`#${type}`).content.querySelector(`.${type}`);
+  const responseMessageElement = responseMessageTemplate.cloneNode(true);
+
+  document.body.appendChild(responseMessageElement);
+
+  removeResponseMessage(responseMessageElement);
+
+  if (type === 'error') {
+    responseMessageElement.querySelector('.error__button');
+
+    responseMessageElement.addEventListener('click', () => {
+      responseMessageElement.remove();
+    });
+  }
+};

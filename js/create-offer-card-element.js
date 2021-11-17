@@ -13,7 +13,7 @@ const validateOfferCardData = (data, element, templateString = data) => {
 };
 
 const createPhotos = (photos, photoListElement) => {
-  if (photos.length === 0) {
+  if (photos === undefined || photos.length === 0) {
     photoListElement.remove();
 
     return;
@@ -34,7 +34,7 @@ const createPhotos = (photos, photoListElement) => {
 };
 
 const createFeatures = (features, featuresListElement) => {
-  if (features.length === 0) {
+  if (features === undefined || features.length === 0) {
     featuresListElement.remove();
 
     return;

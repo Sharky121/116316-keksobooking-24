@@ -1,3 +1,6 @@
+import {sendData} from './fetch-api.js';
+import {createResponseMessage} from './create-response-message.js';
+
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
 const MAX_PRICE = 1000000;
@@ -17,6 +20,11 @@ const typeToPrice = {
   'hotel': 3000,
 };
 
+const ResponseMessage = {
+  SUCCESS: 'success',
+  ERROR: 'error',
+};
+
 const adForm = document.querySelector('.ad-form');
 const filterForm = document.querySelector('.map__filters');
 
@@ -33,7 +41,6 @@ const adRoomSelect = adForm.querySelector('#room_number');
 const adCapacitySelect = adForm.querySelector('#capacity');
 const adTimeInSelect = adForm.querySelector('#timein');
 const adTimeOutSelect = adForm.querySelector('#timeout');
-const adSubmitButton = adForm.querySelector('.ad-form__submit');
 
 const getOptionValue = (select) => {
   const selectedOptionIndex = select.options.selectedIndex;
@@ -55,7 +62,7 @@ const validateAdTitle = () => {
   adTitleInput.reportValidity();
 };
 
-const validateAdPrice = (priceInput) => {
+const isValidTypeToPrice = (priceInput) => {
   const value = parseInt(priceInput.value, RADIX);
   const minValue = parseInt(adPriceInput.min, RADIX);
 
@@ -78,14 +85,14 @@ const isValidRoomToCapacity = () => {
   let errorMessage = '';
 
   if (!isRoomToCapacity) {
-    errorMessage = 'Количество комнат не соответствуте количеству мест';
+    errorMessage ='Количество комнат не соответствуте количеству мест';
   }
 
   adRoomSelect.setCustomValidity(errorMessage);
   adRoomSelect.reportValidity();
 };
 
-const isValidTypeToPrice = () => {
+const setTypeToPrice = () => {
   const priceValue = typeToPrice[getOptionValue(adTypeSelect)];
 
   adPriceInput.placeholder = priceValue;
@@ -108,8 +115,43 @@ const toggleElementsActivity = (elements, status) => {
   });
 };
 
+const resetPage = (resetMap) => {
+  adForm.reset();
+  filterForm.reset();
+  resetMap();
+};
+
+export const setSubmitForm = (resetMap) => {
+  adForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    isValidRoomToCapacity();
+
+    if (evt.target.checkValidity()) {
+      sendData(
+        () => {
+          createResponseMessage(ResponseMessage.SUCCESS);
+          resetPage(resetMap);
+        },
+        () => {
+          createResponseMessage(ResponseMessage.ERROR);
+        },
+        new FormData(adForm),
+      );
+    }
+  });
+};
+
+export const setResetForm = (resetMap) => {
+  adForm.addEventListener('reset', () => {
+    resetPage(resetMap);
+  });
+};
+
 export const isActiveForm = (status) => {
   if (status) {
+    setTypeToPrice();
+
     adForm.classList.remove('ad-form--disabled');
     filterForm.classList.remove('map__filters--disabled');
 
@@ -117,10 +159,10 @@ export const isActiveForm = (status) => {
       validateAdTitle();
     });
     adPriceInput.addEventListener('input', (evt) => {
-      validateAdPrice(evt.target);
+      isValidTypeToPrice(evt.target);
     });
     adTypeSelect.addEventListener('change', () => {
-      isValidTypeToPrice();
+      setTypeToPrice();
     });
     adTimeInSelect.addEventListener('change', () => {
       syncTimeSelect(adTimeInSelect, adTimeOutSelect);
@@ -128,8 +170,10 @@ export const isActiveForm = (status) => {
     adTimeOutSelect.addEventListener('change', () => {
       syncTimeSelect(adTimeOutSelect, adTimeInSelect);
     });
-    adSubmitButton.addEventListener('click', () => {
-      isValidTypeToPrice();
+    adRoomSelect.addEventListener('change', () => {
+      isValidRoomToCapacity();
+    });
+    adCapacitySelect.addEventListener('change', () => {
       isValidRoomToCapacity();
     });
   } else {
