@@ -1,9 +1,12 @@
-const GET_URL = 'https://24.javascript.pages.academy/keksobooking/data';
-const POST_URL = 'https://24.javascript.pages.academy/keksobooking';
 const ERROR_MESSAGE = 'Не удалось отправить форму. Попробуйте ещё раз';
 
+const Url = {
+  GET: 'https://24.javascript.pages.academy/keksobooking/data',
+  POST: 'https://24.javascript.pages.academy/keksobooking',
+};
+
 export const getData = (onSuccess, onError) => {
-  fetch(GET_URL)
+  fetch(Url.GET)
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -21,7 +24,7 @@ export const getData = (onSuccess, onError) => {
 
 export const sendData = (onSuccess, onFail, body) => {
   fetch(
-    POST_URL,
+    Url.POST,
     {
       method: 'POST',
       body,

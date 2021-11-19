@@ -1,5 +1,12 @@
+import {QUANTITY} from './consts.js';
 import {createCustomPopup} from './create-offer-card-element.js';
 import {isActiveForm} from './form.js';
+import {mapFilter} from './filter.js';
+// eslint-disable-next-line
+import {debounce} from './utils/debounce.js';
+
+// eslint-disable-next-line
+const RERENDER_DELAY = 500;
 
 const MapDefaults = {
   CONTAINER: 'map-canvas',
@@ -12,9 +19,12 @@ const MapDefaults = {
     LNG: 139.75393,
   },
   coordsInput: document.querySelector('#address'),
+  mapFilter: document.querySelector('.map__filters'),
 };
 
 const map = L.map(MapDefaults.CONTAINER);
+
+const markersLayer = L.layerGroup();
 
 const Pins = {
   Main: {
@@ -68,6 +78,8 @@ const createMarkers = (points) => points.map((point) => {
   ).bindPopup(createCustomPopup(point));
 });
 
+const createMarkersLayer = (markers) => L.layerGroup(createMarkers(markers));
+
 export const resetMap = () => {
   map.setView(
     {
@@ -81,10 +93,30 @@ export const resetMap = () => {
   setCoordsToInput(MapDefaults.CenterCoords.LAT, MapDefaults.CenterCoords.LNG);
 };
 
+export const clearMap = () => {
+  markersLayer.clearLayers();
+};
+
 export const renderMarkers = (offers) => {
-  const markersGroup = L.layerGroup(createMarkers(offers));
+  const trimOffers = offers.slice(0, QUANTITY);
+  const markersGroup = markersLayer.addLayer(createMarkersLayer(trimOffers));
 
   markersGroup.addTo(map);
+};
+
+const renderSortedMarkers = (offers) => {
+  const filteredOffers = mapFilter(offers);
+
+  clearMap();
+  renderMarkers(filteredOffers);
+};
+
+export const setMapFilter = (offers) => {
+  MapDefaults.mapFilter.addEventListener('change', () => {
+    // eslint-disable-next-line
+    // debounce(() => renderSortedMarkers(offers), RERENDER_DELAY); - не пойму, почему не работает
+    renderSortedMarkers(offers);
+  });
 };
 
 export const renderMap = () => {
