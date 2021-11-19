@@ -7,11 +7,11 @@ const FilterSelectElements = {
   guests: document.querySelector('#housing-guests'),
 };
 
-const filterByType = (selectedOption, type) => {
-  if (selectedOption === 'any' || type === selectedOption) {
-    return true;
-  }
-};
+const filterByType = (selectedOption, type) => selectedOption === 'any' || type === selectedOption;
+
+const filterByRooms = (selectedOption, rooms) => selectedOption === 'any' || rooms === parseInt(selectedOption, RADIX);
+
+const filterByGuests = (selectedOption, guests) => selectedOption === 'any' || guests === parseInt(selectedOption, RADIX);
 
 const filterByPrice = (selectedOption, price) => {
   price = parseInt(price, RADIX);
@@ -31,18 +31,6 @@ const filterByPrice = (selectedOption, price) => {
   return selectedOption === 'high' && price >= 50000;
 };
 
-const filterByRooms = (selectedOption, rooms) => {
-  if (selectedOption === 'any' || rooms === parseInt(selectedOption, RADIX)) {
-    return true;
-  }
-};
-
-const filterByGuests = (selectedOption, guests) => {
-  if (selectedOption === 'any' || guests === parseInt(selectedOption, RADIX)) {
-    return true;
-  }
-};
-
 const getFeaturesRank = ({offer: {features = []}}) => {
   const featuresListElement = document.querySelectorAll('.map__checkbox:checked');
   const featuresSelected = [...featuresListElement].map((input) => input.value);
@@ -58,12 +46,7 @@ const getFeaturesRank = ({offer: {features = []}}) => {
   return rank;
 };
 
-const sortOffers = (offerA, offerB) => {
-  const rankA = getFeaturesRank(offerA);
-  const rankB = getFeaturesRank(offerB);
-
-  return rankB - rankA;
-};
+const sortOffers = (offerA, offerB) => getFeaturesRank(offerB) - getFeaturesRank(offerA);
 
 export const mapFilter = (offers) => offers
   .filter(({offer: {type, price, rooms, guests}}) => filterByType(FilterSelectElements.type.value, type)

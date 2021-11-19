@@ -112,11 +112,9 @@ const renderSortedMarkers = (offers) => {
 };
 
 export const setMapFilter = (offers) => {
-  MapDefaults.mapFilter.addEventListener('change', () => {
-    // eslint-disable-next-line
-    // debounce(() => renderSortedMarkers(offers), RERENDER_DELAY); - не пойму, почему не работает
-    renderSortedMarkers(offers);
-  });
+  MapDefaults.mapFilter.addEventListener(
+    'change',
+    debounce(() => renderSortedMarkers(offers), RERENDER_DELAY));
 };
 
 export const renderMap = () => {
