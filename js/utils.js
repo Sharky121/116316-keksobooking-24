@@ -59,3 +59,9 @@ export const showAlert = (message) => {
 };
 
 export const isEscapeKey = (evt) => evt.key === 'Escape';
+
+export const getOptionValue = (select) => {
+  const selectedOptionIndex = select.options.selectedIndex;
+
+  return select.options[selectedOptionIndex].value;
+};

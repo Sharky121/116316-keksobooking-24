@@ -1,15 +1,15 @@
-import {QUANTITY} from './consts.js';
-import {renderMap, renderMarkers, resetMap} from './map.js';
-import {isActiveForm, setSubmitForm, setResetForm} from './form.js';
-import {getData} from './fetch-api.js';
 import {showAlert} from './utils.js';
+import {getData} from './fetch-api.js';
+import {isActiveForm, setSubmitForm, setResetForm} from './form.js';
+import {renderMap, renderMarkers, resetMap, setMapFilter} from './map.js';
 
 isActiveForm(false);
 renderMap();
 
 getData(
   (offers) => {
-    renderMarkers(offers.slice(0, QUANTITY));
+    renderMarkers(offers);
+    setMapFilter(offers);
   },
   (error) => showAlert(error),
 );

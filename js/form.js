@@ -1,11 +1,17 @@
+import {RADIX} from './consts.js';
+import {getOptionValue} from './utils.js';
 import {sendData} from './fetch-api.js';
 import {createResponseMessage} from './create-response-message.js';
+import {imageLoader} from './image-loader.js';
 
-const MIN_TITLE_LENGTH = 30;
-const MAX_TITLE_LENGTH = 100;
 const MAX_PRICE = 1000000;
-const RADIX = 10;
 
+const AVATAR_DEFAULT_IMAGE = 'img/muffin-grey.svg';
+
+const TitleLength = {
+  MIN: 30,
+  MAX: 100,
+};
 const roomsToCapacity = {
   1: [1],
   2: [1, 2],
@@ -41,20 +47,18 @@ const adRoomSelect = adForm.querySelector('#room_number');
 const adCapacitySelect = adForm.querySelector('#capacity');
 const adTimeInSelect = adForm.querySelector('#timein');
 const adTimeOutSelect = adForm.querySelector('#timeout');
-
-const getOptionValue = (select) => {
-  const selectedOptionIndex = select.options.selectedIndex;
-
-  return select.options[selectedOptionIndex].value;
-};
+const avatarInput = adForm.querySelector('#avatar');
+const avatarPreviewElement = adForm.querySelector('.ad-form-header__preview img');
+const offerPhotoUploadInput = adForm.querySelector('#images');
+const offerPhotoPreviewElement = adForm.querySelector('.ad-form__photo');
 
 const validateAdTitle = () => {
   const valueLength = adTitleInput.value.length;
 
-  if (valueLength < MIN_TITLE_LENGTH) {
-    adTitleInput.setCustomValidity(`Еще ${MIN_TITLE_LENGTH - valueLength} симв.`);
-  } else if (valueLength > MAX_TITLE_LENGTH) {
-    adTitleInput.setCustomValidity(`Удалите лишние ${valueLength - MAX_TITLE_LENGTH} симв.`);
+  if (valueLength < TitleLength.MIN) {
+    adTitleInput.setCustomValidity(`Еще ${TitleLength.MIN - valueLength} симв.`);
+  } else if (valueLength > TitleLength.MAX) {
+    adTitleInput.setCustomValidity(`Удалите лишние ${valueLength - TitleLength.MAX} симв.`);
   } else {
     adTitleInput.setCustomValidity('');
   }
@@ -100,10 +104,8 @@ const setTypeToPrice = () => {
 };
 
 const syncTimeSelect = (firstSelect, secondSelect) => {
-  const firstSelectValue = getOptionValue(firstSelect);
-
   [...secondSelect.options].forEach((element, index) => {
-    if (element.value === firstSelectValue) {
+    if (element.value === firstSelect.value) {
       secondSelect.options[index].selected = true;
     }
   });
@@ -115,13 +117,26 @@ const toggleElementsActivity = (elements, status) => {
   });
 };
 
-const resetPage = (resetMap) => {
-  adForm.reset();
-  filterForm.reset();
-  resetMap();
+const createPreviewImage = (parentElement) => {
+  const img = document.createElement('img');
+
+  img.setAttribute('width', '70');
+  img.setAttribute('height', '70');
+
+  parentElement.innerHTML = '';
+  parentElement.appendChild(img);
+
+  return img;
 };
 
-export const setSubmitForm = (resetMap) => {
+const resetForms = () => {
+  adForm.reset();
+  filterForm.reset();
+  avatarPreviewElement.src = AVATAR_DEFAULT_IMAGE;
+  offerPhotoPreviewElement.innerHTML = '';
+};
+
+export const setSubmitForm = (cb) => {
   adForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
 
@@ -131,7 +146,8 @@ export const setSubmitForm = (resetMap) => {
       sendData(
         () => {
           createResponseMessage(ResponseMessage.SUCCESS);
-          resetPage(resetMap);
+          resetForms();
+          cb();
         },
         () => {
           createResponseMessage(ResponseMessage.ERROR);
@@ -142,9 +158,10 @@ export const setSubmitForm = (resetMap) => {
   });
 };
 
-export const setResetForm = (resetMap) => {
+export const setResetForm = (cb) => {
   adForm.addEventListener('reset', () => {
-    resetPage(resetMap);
+    resetForms();
+    cb();
   });
 };
 
@@ -176,6 +193,16 @@ export const isActiveForm = (status) => {
     adCapacitySelect.addEventListener('change', () => {
       isValidRoomToCapacity();
     });
+
+    avatarInput.addEventListener('change', () => {
+      imageLoader(avatarInput, avatarPreviewElement);
+    });
+
+    offerPhotoUploadInput.addEventListener('change', () => {
+      const offerPreviewImage = createPreviewImage(offerPhotoPreviewElement);
+
+      imageLoader(offerPhotoUploadInput, offerPreviewImage);
+    });
   } else {
     adForm.classList.add('ad-form--disabled');
     filterForm.classList.add('map__filters--disabled');
@@ -185,3 +212,4 @@ export const isActiveForm = (status) => {
     toggleElementsActivity(adFormFieldsetElements, status);
   }
 };
+
