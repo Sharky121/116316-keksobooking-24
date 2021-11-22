@@ -1,6 +1,6 @@
 const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
-export const imageLoader = (fileChooser, preview) => {
+export const getImagePreview = (fileChooser, preview) => {
   const file = fileChooser.files[0];
   const fileName = file.name.toLowerCase();
 

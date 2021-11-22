@@ -12,38 +12,38 @@ const validateOfferCardData = (data, element, templateString = data) => {
     : element.remove();
 };
 
-const createPhotos = (photos, photoListElement) => {
+const createPhotos = (photos, photoList) => {
   if (photos === undefined || photos.length === 0) {
-    photoListElement.remove();
+    photoList.remove();
 
     return;
   }
 
-  const photoTemplate = photoListElement.querySelector('.popup__photo');
+  const photoTemplate = photoList.querySelector('.popup__photo');
   const photoListFragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
-    const photoElement = photoTemplate.cloneNode();
+    const photoImage = photoTemplate.cloneNode();
 
-    photoElement.src = photo;
-    photoListFragment.appendChild(photoElement);
+    photoImage.src = photo;
+    photoListFragment.appendChild(photoImage);
   });
 
-  photoListElement.innerHTML = '';
-  photoListElement.appendChild(photoListFragment);
+  photoList.innerHTML = '';
+  photoList.appendChild(photoListFragment);
 };
 
-const createFeatures = (features, featuresListElement) => {
+const createFeatures = (features, featuresList) => {
   if (features === undefined || features.length === 0) {
-    featuresListElement.remove();
+    featuresList.remove();
 
     return;
   }
 
-  const featureElements = featuresListElement.querySelectorAll('.popup__feature');
+  const featureItems = featuresList.querySelectorAll('.popup__feature');
   const classModifiers = features.map((feature) => `popup__feature--${feature}`);
 
-  featureElements.forEach((featureItem) => {
+  featureItems.forEach((featureItem) => {
     const classModifier = featureItem.classList[1];
 
     if (!classModifiers.includes(classModifier)) {

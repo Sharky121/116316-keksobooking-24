@@ -2,10 +2,8 @@ import {QUANTITY} from './consts.js';
 import {createCustomPopup} from './create-offer-card-element.js';
 import {isActiveForm} from './form.js';
 import {mapFilter} from './filter.js';
-// eslint-disable-next-line
 import {debounce} from './utils/debounce.js';
 
-// eslint-disable-next-line
 const RERENDER_DELAY = 500;
 
 const MapDefaults = {
@@ -106,7 +104,7 @@ export const renderMarkers = (offers) => {
 
 const renderSortedMarkers = (offers) => {
   const filteredOffers = mapFilter(offers);
-
+  filteredOffers.forEach(({offer}) => console.log(offer.features));
   clearMap();
   renderMarkers(filteredOffers);
 };

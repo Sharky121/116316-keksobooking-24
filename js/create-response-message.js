@@ -21,17 +21,17 @@ const removeResponseMessage = (modalElement) => {
 
 export const createResponseMessage = (type) => {
   const responseMessageTemplate = document.querySelector(`#${type}`).content.querySelector(`.${type}`);
-  const responseMessageElement = responseMessageTemplate.cloneNode(true);
+  const responseMessage = responseMessageTemplate.cloneNode(true);
 
-  document.body.appendChild(responseMessageElement);
+  document.body.appendChild(responseMessage);
 
-  removeResponseMessage(responseMessageElement);
+  removeResponseMessage(responseMessage);
 
   if (type === 'error') {
-    responseMessageElement.querySelector('.error__button');
+    responseMessage.querySelector('.error__button');
 
-    responseMessageElement.addEventListener('click', () => {
-      responseMessageElement.remove();
+    responseMessage.addEventListener('click', () => {
+      responseMessage.remove();
     });
   }
 };

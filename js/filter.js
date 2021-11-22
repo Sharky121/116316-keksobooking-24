@@ -1,39 +1,62 @@
 import {RADIX} from './consts.js';
 
-const FilterSelectElements = {
+const PriceValues = {
+  LOW: 0,
+  MIDDLE: 10000,
+  HIGH: 5000,
+};
+
+const SelectValues = {
+  ANY: 'any',
+  LOW: 'low',
+  MIDDLE: 'middle',
+  HIGH: 'high',
+};
+
+const FilterSelects = {
   type: document.querySelector('#housing-type'),
   price: document.querySelector('#housing-price'),
   rooms: document.querySelector('#housing-rooms'),
   guests: document.querySelector('#housing-guests'),
 };
 
-const filterByType = (selectedOption, type) => selectedOption === 'any' || type === selectedOption;
+const filterByType = (selectedOption, type) => selectedOption === SelectValues.ANY || type === selectedOption;
 
-const filterByRooms = (selectedOption, rooms) => selectedOption === 'any' || rooms === parseInt(selectedOption, RADIX);
+const filterByRooms = (selectedOption, rooms) => selectedOption === SelectValues.ANY || rooms === parseInt(selectedOption, RADIX);
 
-const filterByGuests = (selectedOption, guests) => selectedOption === 'any' || guests === parseInt(selectedOption, RADIX);
+const filterByGuests = (selectedOption, guests) => selectedOption === SelectValues.ANY || guests === parseInt(selectedOption, RADIX);
 
 const filterByPrice = (selectedOption, price) => {
   price = parseInt(price, RADIX);
 
-  if (selectedOption === 'any') {
+  if (selectedOption === SelectValues.ANY) {
     return true;
   }
 
-  if (selectedOption === 'low' && price >= 0 && price < 10000) {
+  if (selectedOption === SelectValues.LOW && price >= PriceValues.LOW && price < PriceValues.MIDDLE) {
     return true;
   }
 
-  if (selectedOption === 'middle' && price >=10000 && price < 50000) {
+  if (selectedOption === SelectValues.MIDDLE && price >= PriceValues.MIDDLE && price < PriceValues.HIGH) {
     return true;
   }
 
-  return selectedOption === 'high' && price >= 50000;
+  return selectedOption === SelectValues.HIGH && price >= PriceValues.HIGH;
+};
+
+const filterByFeatures = (features) => {
+  if (features) {
+    const selectedFeatures = document.querySelectorAll('input:checked');
+
+    return [...selectedFeatures].every((item) => features.includes(item.value));
+  }
+
+  return false;
 };
 
 const getFeaturesRank = ({offer: {features = []}}) => {
-  const featuresListElement = document.querySelectorAll('.map__checkbox:checked');
-  const featuresSelected = [...featuresListElement].map((input) => input.value);
+  const featuresList = document.querySelectorAll('.map__checkbox:checked');
+  const featuresSelected = [...featuresList].map((input) => input.value);
 
   let rank = 0;
 
@@ -49,9 +72,10 @@ const getFeaturesRank = ({offer: {features = []}}) => {
 const sortOffers = (offerA, offerB) => getFeaturesRank(offerB) - getFeaturesRank(offerA);
 
 export const mapFilter = (offers) => offers
-  .filter(({offer: {type, price, rooms, guests}}) => filterByType(FilterSelectElements.type.value, type)
-      && filterByPrice(FilterSelectElements.price.value, price)
-      && filterByRooms(FilterSelectElements.rooms.value, rooms)
-      && filterByGuests(FilterSelectElements.guests.value, guests))
+  .filter(({offer: {type, price, rooms, guests, features}}) => filterByType(FilterSelects.type.value, type)
+      && filterByPrice(FilterSelects.price.value, price)
+      && filterByRooms(FilterSelects.rooms.value, rooms)
+      && filterByGuests(FilterSelects.guests.value, guests)
+      && filterByFeatures(features))
   .slice()
   .sort(sortOffers);

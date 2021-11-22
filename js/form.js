@@ -2,11 +2,16 @@ import {RADIX} from './consts.js';
 import {getOptionValue} from './utils.js';
 import {sendData} from './fetch-api.js';
 import {createResponseMessage} from './create-response-message.js';
-import {imageLoader} from './image-loader.js';
+import {getImagePreview} from './image-loader.js';
 
 const MAX_PRICE = 1000000;
 
 const AVATAR_DEFAULT_IMAGE = 'img/muffin-grey.svg';
+
+const ImagePreviwCssProperties = {
+  WIDTH: '70',
+  HEIGHT: '70',
+};
 
 const TitleLength = {
   MIN: 30,
@@ -34,12 +39,10 @@ const ResponseMessage = {
 const adForm = document.querySelector('.ad-form');
 const filterForm = document.querySelector('.map__filters');
 
-const FiltersFormElements = {
-  select: filterForm.querySelectorAll('.map__filter'),
-  checkbox: filterForm.querySelectorAll('.map__checkbox'),
-};
+const filterFormSelects = filterForm.querySelectorAll('.map__filter');
+const filterFormCheckboxes = filterForm.querySelectorAll('.map__checkbox');
 
-const adFormFieldsetElements = adForm.querySelectorAll('.ad-form__element');
+const adFormFields = adForm.querySelectorAll('.ad-form__element');
 const adTitleInput = adForm.querySelector('#title');
 const adPriceInput = adForm.querySelector('#price');
 const adTypeSelect = adForm.querySelector('#type');
@@ -48,9 +51,9 @@ const adCapacitySelect = adForm.querySelector('#capacity');
 const adTimeInSelect = adForm.querySelector('#timein');
 const adTimeOutSelect = adForm.querySelector('#timeout');
 const avatarInput = adForm.querySelector('#avatar');
-const avatarPreviewElement = adForm.querySelector('.ad-form-header__preview img');
+const avatarPreviewImage = adForm.querySelector('.ad-form-header__preview img');
 const offerPhotoUploadInput = adForm.querySelector('#images');
-const offerPhotoPreviewElement = adForm.querySelector('.ad-form__photo');
+const offerPhotoPreviewContainer = adForm.querySelector('.ad-form__photo');
 
 const validateAdTitle = () => {
   const valueLength = adTitleInput.value.length;
@@ -117,14 +120,14 @@ const toggleElementsActivity = (elements, status) => {
   });
 };
 
-const createPreviewImage = (parentElement) => {
+const createPreviewImage = (parent) => {
   const img = document.createElement('img');
 
-  img.setAttribute('width', '70');
-  img.setAttribute('height', '70');
+  img.setAttribute('width', ImagePreviwCssProperties.WIDTH);
+  img.setAttribute('height', ImagePreviwCssProperties.HEIGHT);
 
-  parentElement.innerHTML = '';
-  parentElement.appendChild(img);
+  parent.innerHTML = '';
+  parent.appendChild(img);
 
   return img;
 };
@@ -132,8 +135,8 @@ const createPreviewImage = (parentElement) => {
 const resetForms = () => {
   adForm.reset();
   filterForm.reset();
-  avatarPreviewElement.src = AVATAR_DEFAULT_IMAGE;
-  offerPhotoPreviewElement.innerHTML = '';
+  avatarPreviewImage.src = AVATAR_DEFAULT_IMAGE;
+  offerPhotoPreviewContainer.innerHTML = '';
 };
 
 export const setSubmitForm = (cb) => {
@@ -195,21 +198,21 @@ export const isActiveForm = (status) => {
     });
 
     avatarInput.addEventListener('change', () => {
-      imageLoader(avatarInput, avatarPreviewElement);
+      getImagePreview(avatarInput, avatarPreviewImage);
     });
 
     offerPhotoUploadInput.addEventListener('change', () => {
-      const offerPreviewImage = createPreviewImage(offerPhotoPreviewElement);
+      const offerPreviewImage = createPreviewImage(offerPhotoPreviewContainer);
 
-      imageLoader(offerPhotoUploadInput, offerPreviewImage);
+      getImagePreview(offerPhotoUploadInput, offerPreviewImage);
     });
   } else {
     adForm.classList.add('ad-form--disabled');
     filterForm.classList.add('map__filters--disabled');
 
-    toggleElementsActivity(FiltersFormElements.select, status);
-    toggleElementsActivity(FiltersFormElements.checkbox, status);
-    toggleElementsActivity(adFormFieldsetElements, status);
+    toggleElementsActivity(filterFormSelects, status);
+    toggleElementsActivity(filterFormCheckboxes, status);
+    toggleElementsActivity(adFormFields, status);
   }
 };
 
