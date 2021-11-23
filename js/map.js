@@ -104,7 +104,7 @@ export const renderMarkers = (offers) => {
 
 const renderSortedMarkers = (offers) => {
   const filteredOffers = mapFilter(offers);
-  filteredOffers.forEach(({offer}) => console.log(offer.features));
+
   clearMap();
   renderMarkers(filteredOffers);
 };

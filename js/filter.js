@@ -73,9 +73,9 @@ const sortOffers = (offerA, offerB) => getFeaturesRank(offerB) - getFeaturesRank
 
 export const mapFilter = (offers) => offers
   .filter(({offer: {type, price, rooms, guests, features}}) => filterByType(FilterSelects.type.value, type)
-      && filterByPrice(FilterSelects.price.value, price)
-      && filterByRooms(FilterSelects.rooms.value, rooms)
-      && filterByGuests(FilterSelects.guests.value, guests)
-      && filterByFeatures(features))
+    && filterByPrice(FilterSelects.price.value, price)
+    && filterByRooms(FilterSelects.rooms.value, rooms)
+    && filterByGuests(FilterSelects.guests.value, guests)
+    && filterByFeatures(features))
   .slice()
   .sort(sortOffers);
